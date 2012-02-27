@@ -13,7 +13,9 @@ class ZProwl_Service_ResponseTest
                   . 'remaining="80" '
                   . 'resetdate="123456" />'
                   . '</prowl>';
-        $response = new ZProwl_Service_Response($response);
+        $response = new ZProwl_Service_Response(
+            200, array(), $response
+        );
 
         $this->assertEquals(80, $response->getRemaining());
         $this->assertEquals(123456, $response->getResetDate());
@@ -29,7 +31,9 @@ class ZProwl_Service_ResponseTest
                   . '<prowl>'
                   . '<error code="400">message</error>'
                   . '</prowl>';
-        $response = new ZProwl_Service_Response($response);
+        $response = new ZProwl_Service_Response(
+            200, array(), $response
+        );
 
         $this->assertEquals(null, $response->getRemaining());
         $this->assertEquals(null, $response->getResetDate());

@@ -1,44 +1,56 @@
 <?php
 
+/**
+ * ZProwl
+ *
+ * @category ZProwl
+ * @package  ZProwl_Service
+ * @author   Jérémie Havret <jeremie.havret@gmail.com>
+ */
+
 require_once 'Zend/Service/Abstract.php';
 require_once 'ZProwl/Service/Request/Interface.php';
 
+/**
+ * @category ZProwl
+ * @package  ZProwl_Service
+ * @author   Jérémie Havret <jeremie.havret@gmail.com>
+ */
 abstract class ZProwl_Service_Request_Abstract
-    extends Zend_Service_Abstract
+    extends    Zend_Service_Abstract
     implements ZProwl_Service_Request_Interface
 {
-    /**
+    /**#@+
+     * Available message priorities
      * Available request methods
      */
     const METHOD_GET  = 'GET';
     const METHOD_POST = 'POST';
 
-    /**
+    /**#@+
      * Available request types
      */
     const REQUEST_ADD = 'add';
 
+    /**#@+
+     * Available request types
+     */
+    const BASE_URL =  'https://api.prowlapp.com/publicapi';
+
     /**
-     * ZProwl apikey
+     * Prowl apikey
      *
      * @var string
      */
     protected $_apiKey;
 
     /**
-     * ZProwl provider key, auto detect application name
+     * Prowl provider key, auto detect application name
      * (optionnal)
      *
      * @var string
      */
     protected $_providerKey;
-
-    /**
-     * Message attachement url
-     *
-     * @var string
-     */
-    protected $_url;
 
     /**
      * Request type
@@ -62,7 +74,7 @@ abstract class ZProwl_Service_Request_Abstract
             self::getHttpClient()->setEncType();
         }
 
-        $uri = $this->_url . '/' . $this->_type;
+        $uri = self::BASE_URL . '/' . $this->_type;
 
         self::getHttpClient()->setUri($uri);
 

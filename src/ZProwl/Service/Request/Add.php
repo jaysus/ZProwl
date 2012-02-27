@@ -1,11 +1,23 @@
 <?php
 
+/**
+ * ZProwl
+ *
+ * @category ZProwl
+ * @package  ZProwl_Log
+ * @author   Jérémie Havret <jeremie.havret@gmail.com>
+ */
 require_once 'ZProwl/Service/Request/Abstract.php';
 
+/**
+ * @category ZProwl
+ * @package  ZProwl_Log
+ * @author   Jérémie Havret <jeremie.havret@gmail.com>
+ */
 class ZProwl_Service_Request_Add
     extends ZProwl_Service_Request_Abstract
 {
-    /**
+    /**#@+
      * Available message priorities
      */
     const PRIORITY_VERY_LOW  = -2;
@@ -82,9 +94,15 @@ class ZProwl_Service_Request_Add
 
         require_once 'ZProwl/Service/Response.php';
 
-        $response = new ZProwl_Service_Response($response->getBody());
+        $response = new ZProwl_Service_Response(
+            $response->getStatus(),
+            $response->getHeaders(),
+            $response->getBody(),
+            $response->getVersion(),
+            $response->getMessage()
+        );
 
-        if (!$response->success()) {
+        if (!$response->isSuccessful()) {
             require_once 'ZProwl/Service/Exception.php';
 
             throw new ZProwl_Service_Exception(
@@ -154,6 +172,7 @@ class ZProwl_Service_Request_Add
                 break;
             default  :
                 require_once 'ZProwl/Service/Exception.php';
+
                 throw new ZProwl_Service_Exception(
                     'Invalid priority'
                 );

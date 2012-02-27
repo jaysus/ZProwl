@@ -1,13 +1,25 @@
 <?php
 
-class ZProwl_Service_Response
-{
-    /**
-     * Available statuses
-     */
-    const STATUS_OK  = 1;
-    const STATUS_NOK = 0;
+/**
+ * ZProwl
+ *
+ * @category ZProwl
+ * @package  ZProwl_Service
+ * @author   Jérémie Havret <jeremie.havret@gmail.com>
+ */
 
+require_once 'Zend/Http/Response.php';
+
+/**
+ * ZProwl
+ *
+ * @category ZProwl
+ * @package  ZProwl_Service
+ * @author   Jérémie Havret <jeremie.havret@gmail.com>
+ */
+class ZProwl_Service_Response
+    extends Zend_Http_Response
+{
     /**
      * Prowl xml response
      *
@@ -22,9 +34,23 @@ class ZProwl_Service_Response
      *
      * @return void
      */
-    public function __construct($response)
+     /**
+      * HTTP response constructor
+
+      * @param int    $code Response code (200, 404, ...)
+      * @param array  $headers Headers array
+      * @param string $body Response body
+      * @param string $version HTTP version
+      * @param string $message Response code as text
+
+      * @throws Zend_Http_Exception
+      * @throws ZProwl_Service_Exception
+      */
+     public function __construct($code, array $headers, $body = null, $version = '1.1', $message = null)
     {
-        $xml = @simplexml_load_string($response);
+        parent::__construct($code, $headers, $body, $version, $message);
+
+        $xml = @simplexml_load_string($body);
 
         if ($xml === false) {
             require_once 'ZProwl/Service/Exception.php';
@@ -40,23 +66,13 @@ class ZProwl_Service_Response
      *
      * @return boolean
      */
-    public function success()
+    public function isSuccessful()
     {
-        return $this->getStatus() == self::STATUS_OK;
-    }
-
-    /**
-     * Returns response status
-     *
-     * @return integer
-     */
-    public function getStatus()
-    {
-        if (isset($this->_xml->success)) {
-            return self::STATUS_OK;
+        if (parent::isSuccessFul() && isset($this->_xml->success)) {
+            return true;
         }
 
-        return self::STATUS_NOK;
+        return false;
     }
 
     /**
@@ -66,7 +82,7 @@ class ZProwl_Service_Response
      */
     public function getErrorCode()
     {
-        if (!$this->success()) {
+        if (!$this->isSuccessful()) {
             return (int)$this->_xml->error->attributes()->code;
         }
 
@@ -76,11 +92,11 @@ class ZProwl_Service_Response
     /**
      * Returns error message, nullif success
      *
-     * @returns string|null
+     * @return string|null
      */
     public function getErrorMessage()
     {
-        if (!$this->success()) {
+        if (!$this->isSuccessful()) {
             return (string)$this->_xml->error;
         }
 
@@ -94,7 +110,7 @@ class ZProwl_Service_Response
      */
     public function getRemaining()
     {
-        if ($this->success()) {
+        if ($this->isSuccessful()) {
             return (int)$this->_xml->success->attributes()->remaining;
         }
 
@@ -108,7 +124,7 @@ class ZProwl_Service_Response
      */
     public function getResetDate()
     {
-        if ($this->success()) {
+        if ($this->isSuccessful()) {
             return (int)$this->_xml->success->attributes()->resetdate;
         }
 
